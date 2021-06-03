@@ -34,38 +34,31 @@ async def process_setstate_command(message: types.Message):
         await state.reset_state()
         return await message.reply(MESSAGES['state_reset'])
 
-    if argument not in ('hand', 'stat', 'conf'):
+    if (not argument.isdigit()) or (not int(argument) < len(MyStates.all())):
         return await message.reply(MESSAGES['invalid_key'].format(key=argument))
 
-    if argument == 'hand':
-        await state.set_state(MyStates.all()[0])
-        await message.reply(MESSAGES['hand_mode'], reply=False)
-    elif argument == 'stat':
-        await state.set_state(MyStates.all()[1])
-        await message.reply(MESSAGES['stat'], reply=False)
-    else:
-        await state.set_state(MyStates.all()[2])
-        await message.reply(MESSAGES['conf'], reply=False)
+    await state.set_state(MyStates.all()[int(argument)])
+    await message.reply(MESSAGES['state_change'], reply=False)
+
+
+@dp.message_handler(state=MyStates.HAND_STATE, commands=['for'])
+async def first_test_state_case_met(message: types.Message):
+    await message.reply('for', reply=False)
 
 
 @dp.message_handler(state=MyStates.HAND_STATE)
-async def hand_state_start(message: types.Message):
-    await message.reply('Введите сумму!', reply=False)
+async def first_test_state_case_met(message: types.Message):
+    await message.reply('Hand!', reply=False)
 
 
-@dp.message_handler(commands=['for'], state=MyStates.HAND_STATE)
-async def hand_state_for(message: types.Message):
-    await message.reply('Команда for!', reply=False)
-
-
-@dp.message_handler(state=MyStates.STAT_STATE)
-async def stat_state(message: types.Message):
-    await message.reply('Статистика!', reply=False)
+@dp.message_handler(state=MyStates.STAT_STATE[0])
+async def second_test_state_case_met(message: types.Message):
+    await message.reply('stat', reply=False)
 
 
 @dp.message_handler(state=MyStates.CONF_STATE)
-async def second_test_state_case_met(message: types.Message):
-    await message.reply('Настройка!', reply=False)
+async def third_or_fourth_test_state_case_met(message: types.Message):
+    await message.reply('conf', reply=False)
 
 
 @dp.message_handler()
